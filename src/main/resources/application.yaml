@@ -1,0 +1,26 @@
+jwt:
+  secret: AP/mTtG2INNS9nS/dz4kT+Lxo+Au4PhjfXE09zLKaZs=
+  lifetime: 15m
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dev
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 3002
+
+springdoc:
+  swagger-ui:
+    path: /api/docs
