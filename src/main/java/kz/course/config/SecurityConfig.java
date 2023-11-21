@@ -14,6 +14,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -98,8 +104,31 @@ public class SecurityConfig {
         httpSecurity
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
+        httpSecurity.oauth2Login(httpSecurityOAuth2LoginConfigurer -> {});
+
+        httpSecurity.addFilterBefore(new OAuth2AuthorizationRequestRedirectFilter(clientRegistrationRepository(), "/oauth2/authorization"), OAuth2AuthorizationRequestRedirectFilter.class);
+
         return httpSecurity.build();
     }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        ClientRegistration registration = ClientRegistration
+                .withRegistrationId("google")
+                .clientId("1018336611748-2p4r2h78p31gl0puv2ak0bpdtaavaacv.apps.googleusercontent.com\n")
+                .clientSecret("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")
+            .redirectUri("http://localhost:3002/youtube/get-authorization-url")
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationUri("https://accounts.google.com/o/oauth2/auth")
+                .tokenUri("https://accounts.google.com/o/oauth2/token")
+                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+                .userNameAttributeName(IdTokenClaimNames.SUB)
+                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
+                .clientName("Google")
+                .build();
+        return new InMemoryClientRegistrationRepository(registration);
+    }
+
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {

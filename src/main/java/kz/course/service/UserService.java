@@ -42,4 +42,15 @@ public class UserService {
         userRepository.delete(user);
         return "User successfully deleted";
     }
+
+    public void saveYoutubeToken(Long userId, String token) {
+        User user = userRepository.findById(userId).get();
+        user.setGoogleToken(token);
+        userRepository.save(user);
+    }
+
+    public String getYoutubeToken(Long userId) {
+        User user = userRepository.findById(userId).get();
+        return user.getGoogleToken();
+    }
 }
